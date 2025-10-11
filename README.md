@@ -1,12 +1,12 @@
 # Portfolio V5
 
-Hello everyone\! 👋
+Hello everyone! 👋
 
-Let me introduce myself, I'm **Eki Zulfar Rachman**. On this occasion, I'd like to share the portfolio website project that I've developed.
+Let me introduce myself, I'm **Maissa Drira**. On this occasion, I'd like to share the portfolio website project that I've developed.
 
 ## 🚀 Live Demo
 
-**Website Link:** [https://www.eki.my.id/](https://www.eki.my.id/)
+**Website Link:** [Your Portfolio URL Here]
 
 ## 🛠️ Tech Stack
 
@@ -15,11 +15,32 @@ This project is built using modern web technologies:
   - **ReactJS** - Frontend framework
   - **Tailwind CSS** - Utility-first CSS framework
   - **Supabase** - Backend for portfolio data, certificates, and comment system
+  - **Framer Motion** - Advanced animation library
   - **AOS** - Animate On Scroll library
-  - **Framer Motion** - Animation library
-  - **Lucide** - Icon library
+  - **Lucide React** - Modern icon library
   - **Material UI** - React component library
   - **SweetAlert2** - Beautiful alert dialogs
+  - **React Router DOM** - Client-side routing
+  - **DotLottie React** - Lottie animations for React
+  - **TypeWriter Effect** - Animated typing effects
+  - **GSAP** - High-performance animations
+  - **React Intersection Observer** - Intersection observer hooks
+
+## ✨ Key Features
+
+This portfolio includes several modern features and components:
+
+  - **🎭 Memoji Integration** - Interactive memoji avatar with speech bubbles
+  - **📊 Analytics Tracking** - Comprehensive visitor analytics with Supabase
+  - **🎨 Glassmorphism Design** - Modern UI with backdrop blur effects
+  - **📱 Responsive Design** - Fully responsive across all devices
+  - **🌟 Smooth Animations** - Framer Motion and GSAP powered animations
+  - **💬 Comment System** - Real-time comment functionality
+  - **🏆 Certificate Gallery** - Showcase of achievements and certifications
+  - **🚀 Project Showcase** - Detailed project presentations with tech stacks
+  - **📧 Contact Integration** - Integrated contact forms
+  - **🎯 404 Error Page** - Custom not found page
+  - **⚡ Performance Optimized** - Lazy loading and React optimization
 
 ## 📋 Prerequisites
 
@@ -35,8 +56,8 @@ Follow these steps to run the project locally:
 ### 1\. Clone the Repository
 
 ```bash
-git clone https://github.com/EkiZR/Portofolio_V5.git
-cd Portofolio_V5
+git clone https://github.com/maissa0/portfolio.git
+cd portfolio
 ```
 
 ### 2\. Install Dependencies
@@ -177,14 +198,111 @@ VALUES ('REPLACE_WITH_YOUR_CERTIFICATE_IMAGE_URL.png');
 
 -- Insert one example comment
 INSERT INTO public.portfolio_comments (content, user_name) 
-VALUES ('Created By Eki Zulfar Rachman', 'ekizr');
+VALUES ('Welcome to my portfolio!', 'maissa');
+
+-- ---- ANALYTICS TRACKING SETUP ----
+
+-- Create analytics table for visitor tracking
+CREATE TABLE IF NOT EXISTS portfolio_analytics (
+    id SERIAL PRIMARY KEY,
+    visitor_id VARCHAR(255) NOT NULL,
+    page_url VARCHAR(500),
+    page_title VARCHAR(255),
+    referrer VARCHAR(500),
+    user_agent TEXT,
+    screen_resolution VARCHAR(50),
+    viewport_size VARCHAR(50),
+    language VARCHAR(20),
+    timezone VARCHAR(100),
+    country VARCHAR(100),
+    city VARCHAR(100),
+    ip_address VARCHAR(50),
+    device_type VARCHAR(20),
+    session_start BOOLEAN DEFAULT FALSE,
+    visited_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_portfolio_analytics_visitor_id ON portfolio_analytics(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_portfolio_analytics_visited_at ON portfolio_analytics(visited_at);
+CREATE INDEX IF NOT EXISTS idx_portfolio_analytics_page_url ON portfolio_analytics(page_url);
+
+-- Enable RLS for analytics
+ALTER TABLE portfolio_analytics ENABLE ROW LEVEL SECURITY;
+
+-- Allow anonymous users to insert analytics data
+CREATE POLICY "Allow anonymous analytics inserts" ON portfolio_analytics
+    FOR INSERT TO anon WITH CHECK (true);
+
+-- Allow public read access for analytics
+CREATE POLICY "Allow public analytics selects" ON portfolio_analytics
+    FOR SELECT TO anon, authenticated USING (true);
+
+-- Create analytics dashboard view
+CREATE OR REPLACE VIEW portfolio_dashboard AS
+SELECT 
+    COUNT(*) as total_page_views,
+    COUNT(DISTINCT visitor_id) as unique_visitors,
+    COUNT(*) FILTER (WHERE visited_at >= NOW() - INTERVAL '24 hours') as views_today,
+    COUNT(DISTINCT visitor_id) FILTER (WHERE visited_at >= NOW() - INTERVAL '24 hours') as unique_today,
+    COUNT(*) FILTER (WHERE visited_at >= NOW() - INTERVAL '7 days') as views_week,
+    COUNT(DISTINCT visitor_id) FILTER (WHERE visited_at >= NOW() - INTERVAL '7 days') as unique_week,
+    COUNT(*) FILTER (WHERE device_type = 'Mobile') as mobile_views,
+    COUNT(*) FILTER (WHERE device_type = 'Desktop') as desktop_views
+FROM portfolio_analytics;
+
+-- Grant access to the dashboard view
+GRANT SELECT ON portfolio_dashboard TO anon, authenticated;
 
 ```
 
 ### 3\. Enable Realtime (for Comment System)
 
-  - Go to **Table Editor > portofolio_comments**.
-  - Enable Realtime for the `portfolio_comments`.
+  - Go to **Table Editor > portfolio_comments**.
+  - Enable Realtime for the `portfolio_comments` table.
+
+### 4\. View Analytics Dashboard
+
+After setting up the database, you can monitor your portfolio analytics by running queries in the SQL Editor:
+
+```sql
+-- View overall dashboard
+SELECT * FROM portfolio_dashboard;
+
+-- View recent visitors
+SELECT country, device_type, visited_at 
+FROM portfolio_analytics 
+ORDER BY visited_at DESC 
+LIMIT 10;
+```
+
+## 🎯 Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── AnalyticsTracker.jsx    # Visitor analytics tracking
+│   ├── Background.jsx          # Animated background
+│   ├── CardProject.jsx         # Project card component
+│   ├── Certificate.jsx         # Certificate display
+│   ├── Commentar.jsx          # Comment system
+│   ├── MemojiMessage.jsx       # Interactive memoji avatar
+│   ├── Navbar.jsx             # Navigation component
+│   ├── ProjectDetail.jsx       # Project detail view
+│   └── ...
+├── Pages/               # Main page components
+│   ├── Home.jsx              # Landing page
+│   ├── About.jsx             # About section
+│   ├── Portofolio.jsx        # Portfolio showcase
+│   ├── Contact.jsx           # Contact form
+│   ├── WelcomeScreen.jsx     # Initial loading screen
+│   └── 404.jsx               # Error page
+├── assets/              # Static assets
+├── App.jsx              # Main application component
+├── main.jsx             # Application entry point
+└── supabase.js          # Supabase configuration
+```
 
 ## 🔧 Environment Variables Setup
 
@@ -223,25 +341,49 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 If you encounter issues while running the project:
 
-  - Ensure Node.js is correctly installed.
-  - Verify you're in the correct project directory.
-  - Check that all dependencies are installed without errors.
-  - Make sure your Supabase configuration in the `.env` file is correct and the server has been restarted.
-  - Clear your browser cache and try again.
+  - **Node.js Issues**: Ensure Node.js version 14.x or higher is installed
+  - **Dependency Conflicts**: Try `npm install --legacy-peer-deps` if you encounter peer dependency issues
+  - **Directory Issues**: Verify you're in the correct project directory
+  - **Build Errors**: Clear node_modules and reinstall: `rm -rf node_modules package-lock.json && npm install`
+  - **Supabase Issues**: Ensure your `.env` file has correct credentials and restart the development server
+  - **Browser Issues**: Clear browser cache and try again
+  - **Analytics Not Working**: Make sure you've run the complete SQL script including the analytics tables
+  - **Memoji Not Showing**: Ensure `memoji.png` is placed in the `public` folder
+
+## 🎨 Customization
+
+### Updating Personal Information
+- Update your details in the components and pages
+- Replace the memoji image in `public/memoji.png` with your own
+- Modify the welcome message in `MemojiMessage.jsx`
+- Update social links in the appropriate components
+
+### Styling Customization
+- Colors and themes can be modified in `tailwind.config.js`
+- Component-specific styles are in their respective `.jsx` files
+- Global styles are in `src/index.css`
 
 ## 📝 Usage & Credits
 
-We would appreciate it if you decide to use this project. Please include proper credit when using it. Thank you\! 🙏
+This portfolio template is available for use. If you decide to use this project as a base for your own portfolio, please:
+
+- ⭐ Give this repository a star
+- 🙏 Include proper attribution to the original creator
+- 📧 Consider reaching out to share your implementation
+
+Thank you for your consideration! 
 
 ## 📞 Contact
 
-If you have any questions or need help with the setup, feel free to reach out\!
+If you have any questions or need help with the setup, feel free to reach out!
 
-**Eki Zulfar Rachman**
+**Maissa Drira**
 
-  - Website: [https://www.eki.my.id/](https://www.eki.my.id/)
-  - GitHub: [EkiZR](https://github.com/EkiZR)
+  - Portfolio: [Your Portfolio URL Here]
+  - GitHub: https://github.com/maissa0
+  - LinkedIn: https://www.linkedin.com/in/drira-maissa-220689220/
+  - Email: maissa.drira@esprit.tn
 
------
+---
 
-⭐ If this project helped you, please consider giving it a star on GitHub\!
+⭐ If this project helped you, please consider giving it a star on GitHub!
