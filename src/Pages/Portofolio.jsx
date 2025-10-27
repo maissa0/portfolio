@@ -15,6 +15,7 @@ import TechStackIcon from "../components/TechStackIcon";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
+import InternshipCard from "../components/InternshipCard";
 import { Code, Award, Boxes, Briefcase } from "lucide-react";
 
 
@@ -120,7 +121,15 @@ const techStacks = [
   { icon: "firebase.svg", language: "Firebase" },
   { icon: "MUI.svg", language: "Material UI" },
   { icon: "vercel.svg", language: "Vercel" },
-  { icon: "SweetAlert.svg", language: "SweetAlert2" },
+  { icon: "Angular.png", language: "Angular" },
+  { icon: "aws.png", language: "Amazon Web Services" },
+  { icon: "flutter.png", language: "Flutter" },
+  { icon: "mongodb.svg", language: "MongoDB" },
+  { icon: "mysql.png", language: "MySQL" },
+  { icon: "next-js.png", language: "Next.js" },
+  { icon: "Postgresql.png", language: "PostgreSQL" },
+  { icon: "springboot.png", language: "Spring Boot" },
+  { icon: "Typescript.png", language: "TypeScript" },
 ];
 
 export default function FullWidthTabs() {
@@ -128,8 +137,10 @@ export default function FullWidthTabs() {
   const [value, setValue] = useState(0);
   const [projects, setProjects] = useState([]);
   const [certificates, setCertificates] = useState([]);
+  const [internships, setInternships] = useState([]);
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [showAllCertificates, setShowAllCertificates] = useState(false);
+  const [showAllInternships, setShowAllInternships] = useState(false);
   const isMobile = window.innerWidth < 768;
   const initialItems = isMobile ? 4 : 6;
 
@@ -143,9 +154,10 @@ export default function FullWidthTabs() {
   const fetchData = useCallback(async () => {
     try {
       // Fetching data from Supabase in parallel
-      const [projectsResponse, certificatesResponse] = await Promise.all([
+      const [projectsResponse, certificatesResponse, internshipsResponse] = await Promise.all([
         supabase.from("projects").select("*").order('id', { ascending: true }),
-        supabase.from("certificates").select("*").order('id', { ascending: true }), 
+        supabase.from("certificates").select("*").order('id', { ascending: true }),
+        supabase.from("internships").select("*").order('start_date', { ascending: false }),
       ]);
 
       //Error handling for each request
@@ -154,10 +166,17 @@ export default function FullWidthTabs() {
 
       //Supabase returns data in the 'data' property
       const projectData = projectsResponse.data || [];
-      const certificateData = certificatesResponse.data || [];
+  const certificateData = certificatesResponse.data || [];
+  const internshipData = internshipsResponse.data || [];
 
-      setProjects(projectData);
-      setCertificates(certificateData);
+  setProjects(projectData);
+  setCertificates(certificateData);
+  setInternships(internshipData);
+
+  // cache locally for detail pages (used by ProjectDetail and InternshipDetail)
+  localStorage.setItem("projects", JSON.stringify(projectData));
+  localStorage.setItem("certificates", JSON.stringify(certificateData));
+  localStorage.setItem("internships", JSON.stringify(internshipData));
 
       // Store in localStorage (this functionality is still maintained)
       localStorage.setItem("projects", JSON.stringify(projectData));
@@ -189,13 +208,16 @@ export default function FullWidthTabs() {
   const toggleShowMore = useCallback((type) => {
     if (type === 'projects') {
       setShowAllProjects(prev => !prev);
-    } else {
+    } else if (type === 'certificates') {
       setShowAllCertificates(prev => !prev);
+    } else if (type === 'internships') {
+      setShowAllInternships(prev => !prev);
     }
   }, []);
 
   const displayedProjects = showAllProjects ? projects : projects.slice(0, initialItems);
   const displayedCertificates = showAllCertificates ? certificates : certificates.slice(0, initialItems);
+  const displayedInternships = showAllInternships ? internships : internships.slice(0, initialItems);
 
   // The rest of the components (return statement) remain unchanged.
   return (
@@ -318,7 +340,7 @@ export default function FullWidthTabs() {
         >
           <TabPanel value={value} index={0} dir={theme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {displayedProjects.map((project, index) => (
                   <div
                     key={project.id || index}
@@ -384,6 +406,42 @@ export default function FullWidthTabs() {
                 ))}
               </div>
             </div>
+          </TabPanel>
+
+          <TabPanel value={value} index={3} dir={theme.direction}>
+            <div className="container mx-auto flex justify-center items-center overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {displayedInternships.map((intern, index) => (
+                  <div
+                    key={intern.id || index}
+                    data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
+                    data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
+                  >
+                    <InternshipCard
+                      id={intern.id}
+                      Title={intern.title}
+                      Enterprise={intern.enterprise}
+                      StartDate={intern.start_date}
+                      EndDate={intern.end_date}
+                      Description={intern.description}
+                      Tasks={intern.tasks}
+                      Logo={intern.logo_url}
+                      Certificate={intern.certificate_url}
+                      ProjectId={intern.project_id}
+                      ProjectLink={intern.project_link}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            {internships.length > initialItems && (
+              <div className="mt-6 w-full flex justify-start">
+                <ToggleButton
+                  onClick={() => toggleShowMore('internships')}
+                  isShowingMore={showAllInternships}
+                />
+              </div>
+            )}
           </TabPanel>
         </SwipeableViews>
       </Box>

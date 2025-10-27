@@ -4,7 +4,7 @@ import { Github, Linkedin, Mail, ExternalLink, Instagram, Sparkles } from "lucid
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import MemojiMessage from '../components/MemojiMessage'
+
 
 // Memoized Components
 const StatusBadge = memo(function StatusBadge() {
@@ -267,13 +267,7 @@ const Home = () => {
         </div>
       </div>
       
-      {/* Memoji Message Component */}
-      <MemojiMessage 
-        message="Hey there! I'm the owner of this page, and I'm always open to learning and growing — don't hesitate to share any advice!"
-        autoShow={true}
-        delay={3000}
-        position="bottom-right"
-      />
+      {/* Memoji message is provided globally in App.jsx to avoid duplicates */}
     </div>
   );
 };

@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import Portofolio from "./Pages/Portofolio";
 import ContactPage from "./Pages/Contact";
 import ProjectDetails from "./components/ProjectDetail";
+import InternshipDetail from "./components/InternshipDetail";
 import WelcomeScreen from "./Pages/WelcomeScreen";
 import MemojiMessage from "./components/MemojiMessage";
 //import ViewCounter from "./components/ViewCounter";
@@ -33,12 +34,7 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
           <About />
           <Portofolio />
           <ContactPage />
-          <MemojiMessage 
-            message="Hey there! I'm the owner of this page, and I'm always open to learning and growing .Don't hesitate to share any advice in the comment section!"
-            autoShow={true}
-            delay={5000}
-            position="bottom-right"
-          />
+          <MemojiMessage />
           <AnalyticsTracker />
         </>
       )}
@@ -65,7 +61,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage showWelcome={showWelcome} setShowWelcome={setShowWelcome} />} />
-        <Route path="/project/:id" element={<ProjectPageLayout />} />
+  <Route path="/project/:id" element={<ProjectPageLayout />} />
+  <Route path="/internship/:id" element={<InternshipDetail />} />
          <Route path="*" element={<NotFoundPage />} /> {/* Ini route 404 */}
       </Routes>
     </BrowserRouter>
