@@ -1,4 +1,4 @@
-import { useEffect, memo, useMemo } from "react"
+import { useEffect, memo, useMemo, useState, useRef } from "react"
 import PropTypes from 'prop-types'
 import { FileText, Code, Award, Globe, ArrowUpRight, Sparkles } from "lucide-react"
 import AOS from 'aos'
@@ -171,6 +171,20 @@ const AboutPage = () => {
     };
   }, []);
 
+  // CV dropdown state & click-outside handler
+  const [cvOpen, setCvOpen] = useState(false);
+  const cvRef = useRef(null);
+
+  useEffect(() => {
+    function onDocClick(e) {
+      if (cvRef.current && !cvRef.current.contains(e.target)) {
+        setCvOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
   // Memoized stats data
   const statsData = useMemo(() => [
     {
@@ -256,28 +270,67 @@ const AboutPage = () => {
         </blockquote>
       </div>
 
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-4 lg:px-0 w-full">
-              <a 
-                href="/CV_Maissa_Drira.pdf" 
-                download="CV_Maissa_Drira.pdf"
-                className="w-full lg:w-auto"
-              >
-              <button 
-                data-aos="fade-up"
-                data-aos-duration="800"
-                className="w-full lg:w-auto sm:px-6 py-2 sm:py-3 rounded-lg bg-gradient-to-r from-[#6366f1] to-[#a855f7] text-white font-medium transition-all duration-300 hover:scale-105 flex items-center justify-center lg:justify-start gap-2 shadow-lg hover:shadow-xl "
-              >
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5" /> Download CV
-              </button>
-              </a>
-              <a href="#Portofolio" className="w-full lg:w-auto">
-              <button 
-                data-aos="fade-up"
-                data-aos-duration="1000"
-                className="w-full lg:w-auto sm:px-6 py-2 sm:py-3 rounded-lg border border-[#a855f7]/50 text-[#a855f7] font-medium transition-all duration-300 hover:scale-105 flex items-center justify-center lg:justify-start gap-2 hover:bg-[#a855f7]/10 "
-              >
-                <Code className="w-4 h-4 sm:w-5 sm:h-5" /> View Projects
-              </button>
+            <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4 lg:gap-4 lg:px-0 w-full">
+              {/* Single CV button with a small dropdown */}
+              <div ref={cvRef} className="relative w-full sm:w-auto">
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-expanded={cvOpen}
+                  onClick={() => setCvOpen((s) => !s)}
+                  data-aos="fade-up"
+                  data-aos-duration="800"
+                  className="w-full sm:w-auto sm:px-6 py-2 sm:py-3 rounded-lg bg-gradient-to-r from-[#6366f1] to-[#a855f7] text-white font-medium transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                >
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5" /> Download CV
+                  <svg
+                    className="w-4 h-4 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown menu */}
+                {cvOpen && (
+                  <div
+                    role="menu"
+                    aria-label="Download CV language"
+                    className="absolute left-0 mt-2 w-56 bg-gray-900/90 backdrop-blur rounded-md shadow-xl z-50 ring-1 ring-white/10"
+                  >
+                    <a
+                      href="/resume_maissa_drira_eng.pdf"
+                      download="resume_maissa_drira_eng.pdf"
+                      onClick={() => setCvOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-100 hover:bg-white/5"
+                      role="menuitem"
+                    >
+                      English (EN)
+                    </a>
+                    <a
+                      href="/resume_maissa_drira_fr.pdf"
+                      download="resume_maissa_drira_fr.pdf"
+                      onClick={() => setCvOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-100 hover:bg-white/5"
+                      role="menuitem"
+                    >
+                      Français (FR)
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <a href="#Portofolio" className="w-full sm:w-auto">
+                <button
+                  data-aos="fade-up"
+                  data-aos-duration="1000"
+                  className="w-full sm:w-auto sm:px-6 py-2 sm:py-3 rounded-lg border border-[#a855f7]/50 text-[#a855f7] font-medium transition-all duration-300 hover:scale-105 flex items-center justify-center lg:justify-start gap-2 hover:bg-[#a855f7]/10"
+                >
+                  <Code className="w-4 h-4 sm:w-5 sm:h-5" /> View Projects
+                </button>
               </a>
             </div>
           </div>
